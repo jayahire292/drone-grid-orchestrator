@@ -9,6 +9,8 @@ export interface Drone {
   altitude?: number;
   batteryLevel: number;
   queuedMission?: Mission;
+  assignedLayer?: number;  // Altitude layer assignment (1-5)
+  quadrant?: number;       // Grid quadrant (1-4)
 }
 
 export interface Mission {
@@ -20,7 +22,17 @@ export interface Mission {
   endTime?: number;
 }
 
-export type DroneStatus = 'idle' | 'preparing' | 'taking-off' | 'flying' | 'returning' | 'landing' | 'maintenance';
+export type DroneStatus = 
+  'idle' | 
+  'preparing' | 
+  'taking-off' | 
+  'transition-up' | 
+  'flying' | 
+  'transition-down' | 
+  'returning' | 
+  'landing' | 
+  'emergency' | 
+  'maintenance';
 
 export interface GridPosition {
   x: number;
@@ -39,6 +51,7 @@ export interface Conflict {
   conflictPosition: GridPosition;
   severity: 'low' | 'medium' | 'high';
   timeToConflict: number; // in seconds
+  resolution?: 'altitude-change' | 'path-reroute' | 'time-delay' | 'emergency-stop';
 }
 
 export interface Metrics {
@@ -47,6 +60,24 @@ export interface Metrics {
   completedFlights: number;
   averageFlightTime: number;
   conflictsResolved: number;
+  conflictsDetected: number;
   flightEfficiencyScore: number;
   safetyScore: number;
+  throughputRate: number; // flights per hour
+  waitTimeAverage: number; // seconds
+}
+
+export interface AirspaceStructure {
+  layers: {
+    id: number;
+    name: string;
+    minAltitude: number;
+    maxAltitude: number;
+    purpose: string;
+  }[];
+  quadrants: {
+    id: number;
+    name: string;
+    docks: number[];
+  }[];
 }
